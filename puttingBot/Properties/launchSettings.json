@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "puttingBot": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    }
+  }
+}

@@ -32,8 +32,9 @@ namespace puttingBot
                 }
                 types = types+',' + messageBase.Type.Trim();
             }
-            Console.WriteLine("[{0}]:{1}",types,message);
-            if (message.StartsWith('#'))
+            Console.WriteLine("{2}:[{0}]:{1}",types,message, e.Sender.Id);
+            //各种命令
+            if (message.StartsWith('#') && e.Sender.Id != 1780202038)
             {
                 message = message.Remove(0, 1).ToLower();
                 List<string> messages = message.Split(' ').ToList();
@@ -42,7 +43,7 @@ namespace puttingBot
                 {
                     case "jrrp":
                         int rp = Commands.Jrrp.getJrrp(e.Sender.Id);
-                        var reply = new IMessageBase[] { new AtMessage(e.Sender.Id, ""), new PlainMessage("今日人品是：" + rp+" 哟") };
+                        var reply = new IMessageBase[] { new AtMessage(e.Sender.Id), new PlainMessage("今日人品是：" + rp+" 哟") };
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, reply);
                         return false;
                     case "help":
@@ -55,6 +56,21 @@ namespace puttingBot
                         return false;
                     case "sdvx":
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSdvx()));
+                        return false;
+                    case "chuni":
+                        await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlayChuni.getChuni()));
+                        return false;
+                    case "slry":
+                        if (messages.Count > 1)
+                        {
+                            string input = "";
+                            for (int i = 1; i < messages.Count; i++)
+                                input += messages[i];
+                            string result = await Commands.PlasticJpn.getPlaJpn(input);
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(result));
+                            return false;
+                        }
+                        await session.SendGroupMessageAsync(e.Sender.Group.Id, say("后面加上热语的话哟"));
                         return false;
                     case "gb":
                         if (messages.Count > 1) {
@@ -74,7 +90,7 @@ namespace puttingBot
                                     Console.WriteLine(money);
                                     if (money > 0)
                                     {
-                                        var replys = new IMessageBase[] { new AtMessage(e.Sender.Id, ""), new PlainMessage($"现在有{money}🍮哟") };
+                                        var replys = new IMessageBase[] { new AtMessage(e.Sender.Id), new PlainMessage($"现在有{money}🍮哟") };
                                         await session.SendGroupMessageAsync(e.Sender.Group.Id, replys);
                                     }
                                     else
@@ -92,8 +108,29 @@ namespace puttingBot
                         return false;
                 }
             }
-            if (message.StartsWith("🍮"))
-                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("全部吃掉了哟"));
+            if (message.Contains("樱语"))
+                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("嗯的是的哟"));
+            if (message.Contains("🍮") && e.Sender.Id != 1780202038)
+            {
+                if(message.Contains("💩"))
+                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("味道有点怪哟"));
+                else
+                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("全部吃掉了哟"));
+            } 
+            if ((message == "?"|| message == "？") && e.Sender.Id == 1780202038)
+                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("发你妈问号哟"));
+            if (message.Contains("脚本"))
+                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("脚本哥，差不多得了哟"));
+            if (message.Contains("/mxh") && e.Sender.Id == 1780202038)
+            {
+                var cps = message.Split(" ");
+                try
+                {
+                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say(cps[1] + "和" + cps[2] + "希望你不要再当脚本哥了"));
+                }
+                catch { }
+            }
+                
             return false;
         }
     }

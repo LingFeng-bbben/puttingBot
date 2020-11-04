@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Windows.Data.Text;
 using System.Text;
 using System.Xml.Linq;
 using System.Linq;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
+using System.Threading.Channels;
+using System.IO;
 
 namespace puttingBot.Commands
 {
@@ -11,7 +15,7 @@ namespace puttingBot.Commands
     {
         public string nameToCall = "";
         public string helpComment = "";
-        public static Object[] commandsList = { new Help(),new Jrrp(),new WhatToPlaySdvx(),new Gamble()};
+        public static Object[] commandsList = { new Help(),new Jrrp(), new PlasticJpn(),new WhatToPlaySdvx(),new WhatToPlayChuni()};
     }
     class Jrrp:Command
     {
@@ -55,6 +59,58 @@ namespace puttingBot.Commands
                     songDiff += $"[{e}]";
             }
             return songDiff+"\n"+songName;
+        }
+    }
+    class WhatToPlayChuni : Command
+    {
+        static XElement songDb = XElement.Load("Chuni_MusicSort.xml");
+        public WhatToPlayChuni()
+        {
+            nameToCall = "chuni";
+            helpComment = "宫子帮你决定中二该玩什么歌哟";
+        }
+        public static string getChuni()
+        {
+            var songs = songDb.Element("SortList").Elements("StringID");
+            int songCount =songs.Count();
+            int songid = new Random().Next(0, songCount);
+            XElement TheSong = songs.ToArray()[songid];
+            string songName = TheSong.Element("str").Value;
+            return songName;
+        }
+    }
+    class PlasticJpn : Command
+    {
+        static Dictionary<char, List<string>> dic =
+            JsonConvert.DeserializeObject<Dictionary<char, List<string>>>(
+                File.ReadAllText("JpnDic.json"));
+        public PlasticJpn()
+        {
+            nameToCall = "slry";
+            helpComment = "这句热语，用腻红锅怎么说哟";
+        }
+        public static async Task<string> getPlaJpn(string ipt)
+        {
+            var trcg = new TextReverseConversionGenerator("ja");
+            IReadOnlyList<TextPhoneme> tpl = await trcg.GetPhonemesAsync(ipt);
+            string resultReading = "";
+            string resultKanji = "";
+            foreach (var a in tpl)
+            {
+                resultReading += a.ReadingText;
+                foreach (var b in a.ReadingText)
+                {
+                    try
+                    {
+                        resultKanji += dic[b][0];
+                    }
+                    catch {
+                        resultKanji += b;
+                    }
+                }
+                resultKanji += " ";
+            }
+            return resultKanji;
         }
     }
     partial class Gamble : Command
