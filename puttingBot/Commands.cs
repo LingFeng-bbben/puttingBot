@@ -15,7 +15,7 @@ namespace puttingBot.Commands
     {
         public string nameToCall = "";
         public string helpComment = "";
-        public static Object[] commandsList = { new Help(),new Jrrp(), new PlasticJpn(),new WhatToPlaySdvx(),new WhatToPlayChuni()};
+        public static Object[] commandsList = { new Help(),new Jrrp(),new WhatToPlaySdvx(),new WhatToPlayChuni()};
     }
     class Jrrp:Command
     {
@@ -77,40 +77,6 @@ namespace puttingBot.Commands
             XElement TheSong = songs.ToArray()[songid];
             string songName = TheSong.Element("str").Value;
             return songName;
-        }
-    }
-    class PlasticJpn : Command
-    {
-        static Dictionary<char, List<string>> dic =
-            JsonConvert.DeserializeObject<Dictionary<char, List<string>>>(
-                File.ReadAllText("JpnDic.json"));
-        public PlasticJpn()
-        {
-            nameToCall = "slry";
-            helpComment = "这句热语，用腻红锅怎么说哟";
-        }
-        public static async Task<string> getPlaJpn(string ipt)
-        {
-            var trcg = new TextReverseConversionGenerator("ja");
-            IReadOnlyList<TextPhoneme> tpl = await trcg.GetPhonemesAsync(ipt);
-            string resultReading = "";
-            string resultKanji = "";
-            foreach (var a in tpl)
-            {
-                resultReading += a.ReadingText;
-                foreach (var b in a.ReadingText)
-                {
-                    try
-                    {
-                        resultKanji += dic[b][0];
-                    }
-                    catch {
-                        resultKanji += b;
-                    }
-                }
-                resultKanji += " ";
-            }
-            return resultKanji;
         }
     }
     partial class Gamble : Command

@@ -11,14 +11,15 @@ namespace puttingBot
 {
     public class MessageProcrss : IGroupMessage
     {
+        List<string> lastmessages = new List<string>();
         IMessageBase[] say(string a) {
-            return new IMessageBase[]{new PlainMessage(a)};
+            return new IMessageBase[] { new PlainMessage(a) };
         }
         public async Task<bool> GroupMessage(MiraiHttpSession session, IGroupMessageEventArgs e)
         {
             string message = "";
             string types = "";
-            foreach(IMessageBase messageBase in e.Chain)
+            foreach (IMessageBase messageBase in e.Chain)
             {
                 if (messageBase.Type == "Plain")
                     message = message + messageBase.ToString().Trim();
@@ -30,25 +31,25 @@ namespace puttingBot
                         return false;
                     }
                 }
-                types = types+',' + messageBase.Type.Trim();
+                types = types + ',' + messageBase.Type.Trim();
             }
-            Console.WriteLine("{2}:[{0}]:{1}",types,message, e.Sender.Id);
+            Console.WriteLine("{2}:[{0}]:{1}", types, message, e.Sender.Id);
             //各种命令
             if (message.StartsWith('#') && e.Sender.Id != 1780202038)
             {
                 message = message.Remove(0, 1).ToLower();
                 List<string> messages = message.Split(' ').ToList();
                 //Console.WriteLine(commands[0]);
-                switch(messages[0])
+                switch (messages[0])
                 {
                     case "jrrp":
                         int rp = Commands.Jrrp.getJrrp(e.Sender.Id);
-                        var reply = new IMessageBase[] { new AtMessage(e.Sender.Id), new PlainMessage("今日人品是：" + rp+" 哟") };
+                        var reply = new IMessageBase[] { new AtMessage(e.Sender.Id), new PlainMessage("今日人品是：" + rp + " 哟") };
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, reply);
                         return false;
                     case "help":
                         string helpMenu = "~~~帮助菜单哟~~~\n";
-                        foreach(Commands.Command o in Commands.Command.commandsList)
+                        foreach (Commands.Command o in Commands.Command.commandsList)
                         {
                             helpMenu += String.Format("#{0}:{1}\n", o.nameToCall, o.helpComment);
                         }
@@ -60,18 +61,6 @@ namespace puttingBot
                     case "chuni":
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlayChuni.getChuni()));
                         return false;
-                    case "slry":
-                        if (messages.Count > 1)
-                        {
-                            string input = "";
-                            for (int i = 1; i < messages.Count; i++)
-                                input += messages[i];
-                            string result = await Commands.PlasticJpn.getPlaJpn(input);
-                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(result));
-                            return false;
-                        }
-                        await session.SendGroupMessageAsync(e.Sender.Group.Id, say("后面加上热语的话哟"));
-                        return false;
                     case "gb":
                         if (messages.Count > 1) {
                             switch (messages[1])
@@ -80,7 +69,7 @@ namespace puttingBot
                                     await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Gamble.Help()));
                                     return false;
                                 case "gwq":
-                                    if(Commands.Gamble.GiveMeMoney(e.Sender.Id))
+                                    if (Commands.Gamble.GiveMeMoney(e.Sender.Id))
                                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say("没有布丁了吗？勉为其难给你100🍮哟"));
                                     else
                                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say("你明明自己有🍮哟！！"));
@@ -95,7 +84,7 @@ namespace puttingBot
                                     }
                                     else
                                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say("看来你没有布丁哟？"));
-                                        return false;
+                                    return false;
                                 default:
                                     await session.SendGroupMessageAsync(e.Sender.Group.Id, say("什么东西哟"));
                                     return false;
@@ -112,13 +101,11 @@ namespace puttingBot
                 await session.SendGroupMessageAsync(e.Sender.Group.Id, say("嗯的是的哟"));
             if (message.Contains("🍮") && e.Sender.Id != 1780202038)
             {
-                if(message.Contains("💩"))
+                if (message.Contains("💩"))
                     await session.SendGroupMessageAsync(e.Sender.Group.Id, say("味道有点怪哟"));
                 else
                     await session.SendGroupMessageAsync(e.Sender.Group.Id, say("全部吃掉了哟"));
-            } 
-            if ((message == "?"|| message == "？") && e.Sender.Id == 1780202038)
-                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("发你妈问号哟"));
+            }
             if (message.Contains("脚本"))
                 await session.SendGroupMessageAsync(e.Sender.Group.Id, say("脚本哥，差不多得了哟"));
             if (message.Contains("/mxh") && e.Sender.Id == 1780202038)
@@ -130,8 +117,22 @@ namespace puttingBot
                 }
                 catch { }
             }
-                
+
+            if (repeatedmessage == "") repeatedmessage = message;
+            if (lastmessages.All(o => o == message)&&repeatedmessage != message)
+            {
+                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(message));
+                repeatedmessage = message;
+            }
+            lastmessages.Add(message);
+            if (lastmessages.Count > 2)
+            {
+                lastmessages.RemoveAt(0);
+            }
+            
+
             return false;
         }
+        string repeatedmessage = "";
     }
 }
