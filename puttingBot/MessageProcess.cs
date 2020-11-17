@@ -13,6 +13,7 @@ namespace puttingBot
     {
         List<string> lastmessages = new List<string>();
         IMessageBase[] say(string a) {
+            Console.WriteLine("REPLY: " + a);
             return new IMessageBase[] { new PlainMessage(a) };
         }
         public async Task<bool> GroupMessage(MiraiHttpSession session, IGroupMessageEventArgs e)
@@ -22,7 +23,7 @@ namespace puttingBot
             foreach (IMessageBase messageBase in e.Chain)
             {
                 if (messageBase.Type == "Plain")
-                    message = message + messageBase.ToString().Trim();
+                    message = message + messageBase.ToString();
                 if (messageBase.Type == "At") {
                     AtMessage at = (AtMessage)messageBase;
                     if (at.Target == Program.selfQQnum)
@@ -37,8 +38,9 @@ namespace puttingBot
             //各种命令
             if (message.StartsWith('#') && e.Sender.Id != 1780202038)
             {
-                message = message.Remove(0, 1).ToLower();
+                message = message.Remove(0, 1);
                 List<string> messages = message.Split(' ').ToList();
+                messages[0] = messages[0].ToLower();
                 //Console.WriteLine(commands[0]);
                 switch (messages[0])
                 {
@@ -91,6 +93,48 @@ namespace puttingBot
                             }
                         }
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Gamble.Help()));
+                        return false;
+                    case "dydy":
+                        if (messages.Count > 1)
+                        {
+                            if (messages[1] == "add")
+                            {
+                                string dydy = message.Remove(0,9); 
+                                Commands.Dydy.add(e.Sender.Id,dydy);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("已添加"));
+                            }
+                            if (messages[1] != "add" && messages[1].StartsWith("add"))
+                            {
+                                string dydy = message.Remove(0,8);
+                                Commands.Dydy.add(e.Sender.Id, dydy);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("已添加"));
+                            }
+                        }
+                        else
+                        {
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Dydy.read()));
+                        }
+                        return false;
+                    case "csm":
+                        if (messages.Count > 1)
+                        {
+                            if (messages[1] == "add")
+                            {
+                                string dydy = message.Remove(0, 8);
+                                Commands.Csm.add(e.Sender.Id, dydy);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("已添加"));
+                            }
+                            if (messages[1] != "add" && messages[1].StartsWith("add"))
+                            {
+                                string dydy = message.Remove(0, 7);
+                                Commands.Csm.add(e.Sender.Id, dydy);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("已添加"));
+                            }
+                        }
+                        else
+                        {
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Csm.read()));
+                        }
                         return false;
                     default:
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say("什么东西哟"));
