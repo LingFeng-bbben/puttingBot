@@ -19,6 +19,7 @@ namespace puttingBot
         public async Task<bool> GroupMessage(MiraiHttpSession session, IGroupMessageEventArgs e)
         {
             string message = "";
+            string imgurl = "";
             string types = "";
             foreach (IMessageBase messageBase in e.Chain)
             {
@@ -32,15 +33,20 @@ namespace puttingBot
                         return false;
                     }
                 }
+                if (messageBase.Type == "Image") {
+                    ImageMessage img = (ImageMessage)messageBase;
+                    imgurl = img.Url;
+                }
                 types = types + ',' + messageBase.Type.Trim();
             }
-            Console.WriteLine("{2}:[{0}]:{1}", types, message, e.Sender.Id);
+            Console.WriteLine("{2}:[{0}]({3}):{1}", types, message, e.Sender.Id,imgurl);
             //各种命令
             if (message.StartsWith('#') && e.Sender.Id != 1780202038)
             {
                 message = message.Remove(0, 1);
                 List<string> messages = message.Split(' ').ToList();
                 messages[0] = messages[0].ToLower();
+                messages[0] = messages[0].Trim();
                 //Console.WriteLine(commands[0]);
                 switch (messages[0])
                 {
@@ -136,7 +142,31 @@ namespace puttingBot
                             await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Csm.read()));
                         }
                         return false;
+                    case "long":
+                        string path = Commands.Long.cacLong(imgurl);
+                        Console.WriteLine("UPloading:" + path);
+                        if (path != "false")
+                        {
+                            try
+                            {
+                                ImageMessage msg = await session.UploadPictureAsync(UploadTarget.Group, path);
+                                IMessageBase[] chain = new IMessageBase[] { msg }; // 数组里边可以加上更多的 IMessageBase, 以此达到例如图文并发的情况
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, chain); // 自己填群号, 一般由 IGroupMessageEventArgs 提供
+                                System.IO.File.Delete(path);
+                            }
+                            catch (Exception ee)
+                            {
+                                Console.WriteLine(ee.Message);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("本布丁认为：本图无龙哟"));
+                            }
+                        }
+                        else
+                        {
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say("解析出错了哟"));
+                        }
+                        return false;
                     default:
+                        Console.WriteLine("Unknown command:" + messages[0]);
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say("什么东西哟"));
                         return false;
                 }

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using Windows.Data.Text;
+using System.Drawing;
 using System.Text;
 using System.Xml.Linq;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Threading.Channels;
 using System.IO;
+using System.Net;
+using System.Diagnostics;
 
 namespace puttingBot.Commands
 {
@@ -15,7 +18,7 @@ namespace puttingBot.Commands
     {
         public string nameToCall = "";
         public string helpComment = "";
-        public static Object[] commandsList = { new Help(),new Jrrp(),new Dydy() ,new WhatToPlaySdvx(),new WhatToPlayChuni()};
+        public static Object[] commandsList = { new Help(),new Jrrp(),new Dydy() ,new WhatToPlaySdvx(),new WhatToPlayChuni(),new Long()};
     }
     class Jrrp:Command
     {
@@ -140,6 +143,49 @@ namespace puttingBot.Commands
             for (int i = 0; i < random.Next(5, random.Next(5, 88)); i++)
                 radIndex = random.Next(0, dydyJson.dyItems.Count);
             return dydyJson.dyItems[radIndex].dyData;
+        }
+    }
+
+    class Long : Command
+    {
+        static string longRepoPath = "/usr/torch/";
+        public Long()
+        {
+            nameToCall = "long";
+            helpComment = "加上带人脸图片，计算龙度";
+        }
+        public static string cacLong(string url)
+        {
+            WebClient wc = new WebClient();
+            
+            Console.WriteLine("downloading");
+            try
+            {
+                byte[] data = wc.DownloadData(url);
+                Console.WriteLine("saving");
+                MemoryStream ms = new MemoryStream(data);
+                Image image = Image.FromStream(ms);
+                Console.WriteLine(image.RawFormat.ToString());
+                if (image.RawFormat.ToString() == "Gif")
+                    return "false";
+                string filename = image.GetHashCode().ToString();
+                string filepath = longRepoPath + "imgreco/" + filename + ".jpg";
+                
+                image.Save(filepath);
+                Process p = new Process();
+                p.StartInfo.FileName = "bash";
+                p.StartInfo.Arguments = "/usr/torch/run.sh";
+                p.StartInfo.RedirectStandardOutput = true;
+                p.Start();
+                Console.WriteLine(p.StandardOutput.ReadToEnd());
+                string resultpath = longRepoPath + "imgresult/" + filename + ".jpg";
+                //System.Diagnostics.Process.Start("bash /usr/torch/run.sh"); //this do not work
+                return resultpath;
+            }
+            catch(Exception e) {
+                Console.WriteLine("failed."+e.Message);
+                return "false";
+            }
         }
     }
 }
