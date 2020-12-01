@@ -156,29 +156,16 @@ namespace puttingBot.Commands
         }
         public static string cacLong(string url)
         {
-            WebClient wc = new WebClient();
-            
-            Console.WriteLine("downloading");
-            try
-            {
-                byte[] data = wc.DownloadData(url);
-                Console.WriteLine("saving");
-                MemoryStream ms = new MemoryStream(data);
-                Image image = Image.FromStream(ms);
-                Console.WriteLine(image.RawFormat.ToString());
-                if (image.RawFormat.ToString() == "Gif")
-                    return "false";
-                string filename = image.GetHashCode().ToString();
-                string filepath = longRepoPath + "imgreco/" + filename + ".jpg";
-                
-                image.Save(filepath);
+            try{
+                string resultpath = Download.downloadPic(url, longRepoPath + "imgreco/");
+                resultpath = resultpath.Replace("imgreco", "imgresult");
                 Process p = new Process();
                 p.StartInfo.FileName = "bash";
                 p.StartInfo.Arguments = "/usr/torch/run.sh";
                 p.StartInfo.RedirectStandardOutput = true;
                 p.Start();
                 Console.WriteLine(p.StandardOutput.ReadToEnd());
-                string resultpath = longRepoPath + "imgresult/" + filename + ".jpg";
+
                 //System.Diagnostics.Process.Start("bash /usr/torch/run.sh"); //this do not work
                 return resultpath;
             }
@@ -186,6 +173,66 @@ namespace puttingBot.Commands
                 Console.WriteLine("failed."+e.Message);
                 return "false";
             }
+        }
+    }
+
+    class Weather : Command
+    {
+        public Weather()
+        {
+            nameToCall = "tq";
+            helpComment = "查询天气";
+        }
+
+        public static string GetWeatherNow(int citycode = 58349)
+        {
+            WeatherJson.Root weather = Download.downloadJson<WeatherJson.Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
+
+            string weatherString = "布丁布丁，看看"+ weather.data.predict.station.city+ "现在天气怎么样哟！\n";
+
+            WeatherJson.Weather wea = weather.data.real.weather;
+
+            weatherString += wea.info + ", 温度" + wea.temperature + "℃, 湿度" + wea.humidity + "%\n";
+            weatherString += "降水量:" + wea.rain + "mm";
+
+
+            return weatherString;
+        }
+
+        public static string GetWeather(int citycode = 58349, int day = 0)
+        {
+            WeatherJson.Root weather = Download.downloadJson<WeatherJson.Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
+            WeatherJson.Detail detail = weather.data.predict.detail[day];
+
+            string weatherString = "布丁布丁，播报天气哟！\n";
+            weatherString += weather.data.predict.station.city + " " + detail.date + "\n";
+
+            WeatherJson.Weather wea = new WeatherJson.Weather();
+            if(detail.day.weather.info != "9999")
+            {
+                wea = detail.day.weather;
+                weatherString += "白天\n";
+                weatherString += wea.info + ", 温度" + wea.temperature + "℃\n";
+                wea = detail.night.weather;
+                weatherString += "晚上\n";
+                weatherString += wea.info + ", 温度" + wea.temperature + "℃";
+            }
+            else
+            {
+                wea = detail.night.weather;
+                weatherString += "晚上\n";
+                weatherString += wea.info + ", 温度" + wea.temperature + "℃";
+            }
+            
+            return weatherString;
+        }
+
+        public static string GetRadar(int citycode = 58349)
+        {
+            WeatherJson.Root weather = Download.downloadJson<WeatherJson.Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
+            string url = weather.data.radar.image;
+            string picpath = Download.downloadPic("http://image.nmc.cn" + url,"/usr/weather/");
+            return picpath;
         }
     }
 }

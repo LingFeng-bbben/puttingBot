@@ -150,8 +150,8 @@ namespace puttingBot
                             try
                             {
                                 ImageMessage msg = await session.UploadPictureAsync(UploadTarget.Group, path);
-                                IMessageBase[] chain = new IMessageBase[] { msg }; // 数组里边可以加上更多的 IMessageBase, 以此达到例如图文并发的情况
-                                await session.SendGroupMessageAsync(e.Sender.Group.Id, chain); // 自己填群号, 一般由 IGroupMessageEventArgs 提供
+                                IMessageBase[] chain = new IMessageBase[] { msg }; 
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, chain); 
                                 System.IO.File.Delete(path);
                             }
                             catch (Exception ee)
@@ -163,6 +163,37 @@ namespace puttingBot
                         else
                         {
                             await session.SendGroupMessageAsync(e.Sender.Group.Id, say("解析出错了哟"));
+                        }
+                        return false;
+                    case "tq":
+                        if (messages.Count > 1)
+                        {
+                            if (messages[1] == "mt")
+                            {
+                                string tq = Commands.Weather.GetWeather(58349, 1);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(tq));
+                            }
+                            if (messages[1] == "ld")
+                            {
+                                string picpath = Commands.Weather.GetRadar();
+                                try
+                                {
+                                    ImageMessage msg = await session.UploadPictureAsync(UploadTarget.Group, picpath);
+                                    IMessageBase[] chain = new IMessageBase[] { msg };
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, chain);
+                                    System.IO.File.Delete(picpath);
+                                }
+                                catch (Exception ee)
+                                {
+                                    Console.WriteLine(ee.Message);
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("出错了哟"));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            string tq = Commands.Weather.GetWeatherNow();
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(tq));
                         }
                         return false;
                     default:
