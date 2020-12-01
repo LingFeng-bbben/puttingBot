@@ -40,14 +40,25 @@ namespace puttingBot
                 types = types + ',' + messageBase.Type.Trim();
             }
             Console.WriteLine("{2}:[{0}]({3}):{1}", types, message, e.Sender.Id,imgurl);
+            //
+            GroupSettting.Setting groupsetting = new GroupSettting.Setting();
+            groupsetting.groupNum = e.Sender.Group.Id;
+            try
+            {
+                groupsetting = GetGSetting.GetSetting(e.Sender.Group.Id);
+            }
+            catch
+            {
+                Console.WriteLine("未找到设定,正在创建设定档");
+                GetGSetting.SetSetting(groupsetting);
+            }
             //各种命令
-            if (message.StartsWith('#') && e.Sender.Id != 1780202038)
+            if (message.StartsWith('#'))
             {
                 message = message.Remove(0, 1);
                 List<string> messages = message.Split(' ').ToList();
                 messages[0] = messages[0].ToLower();
                 messages[0] = messages[0].Trim();
-                //Console.WriteLine(commands[0]);
                 switch (messages[0])
                 {
                     case "jrrp":
@@ -69,37 +80,6 @@ namespace puttingBot
                     case "chuni":
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlayChuni.getChuni()));
                         return false;
-                    case "gb":
-                        if (messages.Count > 1) {
-                            switch (messages[1])
-                            {
-                                case "help":
-                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Gamble.Help()));
-                                    return false;
-                                case "gwq":
-                                    if (Commands.Gamble.GiveMeMoney(e.Sender.Id))
-                                        await session.SendGroupMessageAsync(e.Sender.Group.Id, say("没有布丁了吗？勉为其难给你100🍮哟"));
-                                    else
-                                        await session.SendGroupMessageAsync(e.Sender.Group.Id, say("你明明自己有🍮哟！！"));
-                                    return false;
-                                case "q":
-                                    long money = Commands.Gamble.CheckMyMoney(e.Sender.Id);
-                                    Console.WriteLine(money);
-                                    if (money > 0)
-                                    {
-                                        var replys = new IMessageBase[] { new AtMessage(e.Sender.Id), new PlainMessage($"现在有{money}🍮哟") };
-                                        await session.SendGroupMessageAsync(e.Sender.Group.Id, replys);
-                                    }
-                                    else
-                                        await session.SendGroupMessageAsync(e.Sender.Group.Id, say("看来你没有布丁哟？"));
-                                    return false;
-                                default:
-                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("什么东西哟"));
-                                    return false;
-                            }
-                        }
-                        await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Gamble.Help()));
-                        return false;
                     case "dydy":
                         if (messages.Count > 1)
                         {
@@ -108,6 +88,18 @@ namespace puttingBot
                                 string dydy = message.Remove(0,9); 
                                 Commands.Dydy.add(e.Sender.Id,dydy);
                                 await session.SendGroupMessageAsync(e.Sender.Group.Id, say("已添加"));
+                            }
+                            if (messages[1] == "disable" && e.Sender.Permission > GroupPermission.Member)
+                            {
+                                groupsetting.disableDydy = true;
+                                GetGSetting.SetSetting(groupsetting);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("已停止dydy在本群的响应"));
+                            }
+                            if (messages[1] == "enable" && e.Sender.Permission > GroupPermission.Member)
+                            {
+                                groupsetting.disableDydy = false;
+                                GetGSetting.SetSetting(groupsetting);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Dydy.read()));
                             }
                             if (messages[1] != "add" && messages[1].StartsWith("add"))
                             {
@@ -118,7 +110,8 @@ namespace puttingBot
                         }
                         else
                         {
-                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Dydy.read()));
+                            if(!groupsetting.disableDydy)
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Dydy.read()));
                         }
                         return false;
                     case "csm":
@@ -170,12 +163,43 @@ namespace puttingBot
                         {
                             if (messages[1] == "mt")
                             {
-                                string tq = Commands.Weather.GetWeather(58349, 1);
+                                string tq = Commands.Weather.GetWeather(groupsetting.bindingCity, 1);
                                 await session.SendGroupMessageAsync(e.Sender.Group.Id, say(tq));
                             }
                             if (messages[1] == "ld")
                             {
-                                string picpath = Commands.Weather.GetRadar();
+                                string picpath = Commands.Weather.GetRadar(groupsetting.bindingCity);
+                                try
+                                {
+                                    ImageMessage msg = await session.UploadPictureAsync(UploadTarget.Group, picpath);
+                                    IMessageBase[] chain = new IMessageBase[] { msg };
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, chain);
+                                    System.IO.File.Delete(picpath);
+                                }
+                                catch (Exception ee)
+                                {
+                                    Console.WriteLine(ee.Message);
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("出错了哟"));
+                                }
+                            }
+                            if (messages[1] == "prvlist")
+                            {
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Weather.GetPrv()));
+                            }
+                            if (messages[1] == "citylist")
+                            {
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Weather.GetCity(messages[2])));
+                            }
+                            if (messages[1] == "bind")
+                            {
+                                groupsetting.bindingCity = int.Parse(messages[2]);
+                                string tq = Commands.Weather.GetWeatherNow(groupsetting.bindingCity);
+                                GetGSetting.SetSetting(groupsetting);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say("成功绑定！！\n"+tq));
+                            }
+                            if (messages[1] == "ana")
+                            {
+                                string picpath = Commands.Weather.GetAnalyze();
                                 try
                                 {
                                     ImageMessage msg = await session.UploadPictureAsync(UploadTarget.Group, picpath);
@@ -192,7 +216,7 @@ namespace puttingBot
                         }
                         else
                         {
-                            string tq = Commands.Weather.GetWeatherNow();
+                            string tq = Commands.Weather.GetWeatherNow(groupsetting.bindingCity);
                             await session.SendGroupMessageAsync(e.Sender.Group.Id, say(tq));
                         }
                         return false;
@@ -202,9 +226,10 @@ namespace puttingBot
                         return false;
                 }
             }
+            //关键词触发
             if (message.Contains("樱语"))
                 await session.SendGroupMessageAsync(e.Sender.Group.Id, say("嗯的是的哟"));
-            if (message.Contains("🍮") && e.Sender.Id != 1780202038)
+            if (message.Contains("🍮"))
             {
                 if (message.Contains("💩"))
                     await session.SendGroupMessageAsync(e.Sender.Group.Id, say("味道有点怪哟"));
@@ -213,15 +238,7 @@ namespace puttingBot
             }
             if (message.Contains("脚本"))
                 await session.SendGroupMessageAsync(e.Sender.Group.Id, say("脚本哥，差不多得了哟"));
-            if (message.Contains("/mxh") && e.Sender.Id == 1780202038)
-            {
-                var cps = message.Split(" ");
-                try
-                {
-                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say(cps[1] + "和" + cps[2] + "希望你不要再当脚本哥了"));
-                }
-                catch { }
-            }
+
 
             if (repeatedmessage == "") repeatedmessage = message;
             if (lastmessages.All(o => o == message)&&repeatedmessage != message)

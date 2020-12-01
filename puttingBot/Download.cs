@@ -43,6 +43,11 @@ namespace puttingBot
 
         public static T downloadJson<T>(string url)
         {
+            return JsonConvert.DeserializeObject<T>(downloadText(url));
+        }
+
+        public static string downloadText(string url)
+        {
 
             WebClient wc = new WebClient();
 
@@ -51,9 +56,8 @@ namespace puttingBot
             {
                 byte[] data = wc.DownloadData(url);
                 Console.WriteLine("saving");
-                MemoryStream ms = new MemoryStream(data);
                 string text = Encoding.UTF8.GetString(data);
-                return JsonConvert.DeserializeObject<T>(text);
+                return text;
             }
             catch (Exception e)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace WeatherJson
 {
@@ -55,8 +56,6 @@ namespace WeatherJson
         public Wind? wind { get; set; }
         public Warn? warn { get; set; }
     }
-
-
 
     public class Day
     {
@@ -158,4 +157,37 @@ namespace WeatherJson
         public int? code { get; set; }
         public Data data { get; set; }
     }
+}
+
+namespace PrvJson
+{
+    public class Root
+    {
+        [JsonProperty("code")]
+        public string Code { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("url")]
+        public string Url { get; set; }
+    }
+}
+
+namespace CityJson {
+    public partial class Root
+    {
+        [JsonProperty("code")]
+        public string Code { get; set; }
+
+        [JsonProperty("province")]
+        public string Province { get; set; }
+
+        [JsonProperty("city")]
+        public string City { get; set; }
+
+        [JsonProperty("url")]
+        public string Url { get; set; }
+    }
+
 }

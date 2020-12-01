@@ -5,12 +5,10 @@ using System.Text;
 using System.Xml.Linq;
 using System.Linq;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Threading.Channels;
 using System.IO;
 using System.Net;
 using System.Diagnostics;
+using HtmlAgilityPack;
 
 namespace puttingBot.Commands
 {
@@ -18,7 +16,7 @@ namespace puttingBot.Commands
     {
         public string nameToCall = "";
         public string helpComment = "";
-        public static Object[] commandsList = { new Help(),new Jrrp(),new Dydy() ,new WhatToPlaySdvx(),new WhatToPlayChuni(),new Long()};
+        public static Object[] commandsList = { new Help(),new Jrrp(),new Dydy(),new Weather() ,new WhatToPlaySdvx(),new WhatToPlayChuni(),new Long()};
     }
     class Jrrp:Command
     {
@@ -80,14 +78,6 @@ namespace puttingBot.Commands
             XElement TheSong = songs.ToArray()[songid];
             string songName = TheSong.Element("str").Value;
             return songName;
-        }
-    }
-    partial class Gamble : Command
-    {
-        public Gamble()
-        {
-            nameToCall = "gb";
-            helpComment = "赌狗游戏相关哟,具体请#gb help哟";
         }
     }
 
@@ -232,6 +222,40 @@ namespace puttingBot.Commands
             WeatherJson.Root weather = Download.downloadJson<WeatherJson.Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
             string url = weather.data.radar.image;
             string picpath = Download.downloadPic("http://image.nmc.cn" + url,"/usr/weather/");
+            return picpath;
+        }
+
+        public static string GetPrv()
+        {
+            PrvJson.Root[] roots = Download.downloadJson<PrvJson.Root[]>("http://www.nmc.cn/rest/province/all");
+            string list = "tx夹我放不出名字，缩写自个儿看吧";
+            foreach(PrvJson.Root prv in roots)
+            {
+                list += prv.Code + "，";
+            }
+            return list;
+        }
+
+        public static string GetCity(string prv)
+        {
+            CityJson.Root[] roots = Download.downloadJson<CityJson.Root[]>("http://www.nmc.cn/rest/province/"+prv);
+            string list = "";
+            foreach (CityJson.Root city in roots)
+            {
+                list += city.Code + " " + city.City + "\n";
+            }
+            return list;
+        }
+
+        public static string GetAnalyze() {
+            string html = Download.downloadText("http://www.nmc.cn/publish/observations/china/dm/radar-h000.htm");
+            var htmldoc = new HtmlDocument();
+            htmldoc.LoadHtml(html);
+
+            HtmlNode imgNode = htmldoc.DocumentNode.SelectSingleNode("//div[@class=\"container\"]/div[@class=\"row\"]/div[@class=\"col-xs-10\"]/div[@class=\"bgwhite\"]/div[@class=\"row\"]/div[@class=\"col-xs-10\"]/div[@class=\"imgblock\"]/img[@id=\"imgpath\"]");
+            string url = imgNode.Attributes.First(o => o.Name == "src").Value;
+            Console.WriteLine(url);
+            string picpath = Download.downloadPic(url, "/usr/weather/");
             return picpath;
         }
     }
