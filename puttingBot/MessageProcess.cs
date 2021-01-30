@@ -80,6 +80,9 @@ namespace puttingBot
                     case "chuni":
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlayChuni.getChuni()));
                         return false;
+                    case "rbdx":
+                        await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlayRBDX.getRBDX()));
+                        return false;
                     case "dydy":
                         if (messages.Count > 1)
                         {

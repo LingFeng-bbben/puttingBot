@@ -16,7 +16,7 @@ namespace puttingBot.Commands
     {
         public string nameToCall = "";
         public string helpComment = "";
-        public static Object[] commandsList = { new Help(),new Jrrp(),new Dydy(),new Weather() ,new WhatToPlaySdvx(),new WhatToPlayChuni(),new Long()};
+        public static Object[] commandsList = { new Help(),new Jrrp(),new Dydy(),new Weather() ,new WhatToPlaySdvx(),new WhatToPlayChuni(),new WhatToPlayRBDX(),new Long()};
     }
     class Jrrp:Command
     {
@@ -257,6 +257,28 @@ namespace puttingBot.Commands
             Console.WriteLine(url);
             string picpath = Download.downloadPic(url, "/usr/weather/");
             return picpath;
+        }
+    }
+
+    class WhatToPlayRBDX : Command
+    {
+        static string[] songDB = File.ReadAllLines("RBDX.txt");
+        public WhatToPlayRBDX()
+        {
+            nameToCall = "rbdx";
+            helpComment = "宫子帮你决定日本大学该玩什么歌哟";
+        }
+        public static string getRBDX()
+        {
+            int songCount = songDB.Count();
+            int songid = new Random().Next(0, songCount);
+            string[] TheSong = songDB[songid].Split("	");
+            string message = TheSong[1] + "\n";//6 11 16
+            message += TheSong[8] != "-" ? "[" + TheSong[8] + ":" + TheSong[12]+ "] " : "";
+            message += TheSong[13] != "-" ? "[" + TheSong[13] + ":" + TheSong[17] + "] " : "";
+            message += TheSong[18] != "-" ? "[" + TheSong[18] + ":" + TheSong[22] + "] " : "";
+            message += TheSong[23] != "-" ? "[" + TheSong[23] + ":" + TheSong[27] + "]" : "";
+            return message;
         }
     }
 }
