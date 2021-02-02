@@ -84,7 +84,7 @@ namespace puttingBot.Commands
     class Dydy : Command
     {
         static string jsFilePath = "dydy.json";
-        static Random random = new Random(new Guid().GetHashCode());
+        static Random random = new Random(new Guid().GetHashCode()+(int)DateTime.Now.Ticks);
         public Dydy()
         {
             nameToCall = "dydy";
@@ -262,7 +262,8 @@ namespace puttingBot.Commands
 
     class WhatToPlayRBDX : Command
     {
-        static string[] songDB = File.ReadAllLines("RBDX.txt");
+        const string filename = "RBDX.txt";
+        static Random random = new Random(new Guid().GetHashCode() + (int)DateTime.Now.Ticks);
         public WhatToPlayRBDX()
         {
             nameToCall = "rbdx";
@@ -270,15 +271,28 @@ namespace puttingBot.Commands
         }
         public static string getRBDX()
         {
-            int songCount = songDB.Count();
-            int songid = new Random().Next(0, songCount);
-            string[] TheSong = songDB[songid].Split("	");
-            string message = TheSong[1] + "\n";//6 11 16
-            message += TheSong[8] != "-" ? "[" + TheSong[8] + ":" + TheSong[12]+ "] " : "";
-            message += TheSong[13] != "-" ? "[" + TheSong[13] + ":" + TheSong[17] + "] " : "";
-            message += TheSong[18] != "-" ? "[" + TheSong[18] + ":" + TheSong[22] + "] " : "";
-            message += TheSong[23] != "-" ? "[" + TheSong[23] + ":" + TheSong[27] + "]" : "";
-            return message;
+            string[] songStr = File.ReadAllLines(filename);
+            Formats.RbdxCsv songDB = new Formats.RbdxCsv(songStr);
+            int songCount = songDB.list.Count();
+            int songid = random.Next(0, songCount);
+            return songDB.list[songid].ToString();
+        }
+        public static string getRBDX(int level)
+        {
+            try
+            {
+                string[] songStr = File.ReadAllLines(filename);
+                Formats.RbdxCsv songDB = new Formats.RbdxCsv(songStr);
+                List<Formats.RbdxSong> levelList = songDB.list.FindAll(o => o.fumens.Any(p => p.level == level));
+                Console.WriteLine(levelList);
+                int songCount = levelList.Count();
+                int songid = random.Next(0, songCount);
+                return levelList[songid].ToString();
+            }
+            catch(Exception e)
+            {
+                return e.Message + e.StackTrace;
+            }
         }
     }
 }
