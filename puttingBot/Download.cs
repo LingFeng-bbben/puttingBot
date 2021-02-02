@@ -41,17 +41,19 @@ namespace puttingBot
             }
         }
 
-        public static T downloadJson<T>(string url)
+        public static T downloadJson<T>(string url, string cookie = "", string bearer = "")
         {
-            return JsonConvert.DeserializeObject<T>(downloadText(url));
+            return JsonConvert.DeserializeObject<T>(downloadText(url, cookie, bearer));
         }
 
-        public static string downloadText(string url)
+        public static string downloadText(string url,string cookie = "",string bearer = "")
         {
 
             WebClient wc = new WebClient();
+            if (cookie != "") wc.Headers.Add("cookie", cookie);
+            if (bearer != "") wc.Headers.Add("authorization", "Bearer " + bearer);
 
-            Console.WriteLine("downloading");
+            Console.WriteLine("downloading " + url);
             try
             {
                 byte[] data = wc.DownloadData(url);
