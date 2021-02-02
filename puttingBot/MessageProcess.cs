@@ -84,6 +84,13 @@ namespace puttingBot
                                 await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.ArcScore.BindUser(messages[2], e.Sender.Id)));
                             if (messages[1] == "bindid")
                                 await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.ArcScore.Bindid(messages[2], e.Sender.Id)));
+                            return false;
+                        }
+                        if (messages.Count > 1)
+                        {
+                            int index = int.Parse(messages[1]);
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.ArcScore.GetRecent(e.Sender.Id, index)));
+                            return false;
                         }
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.ArcScore.GetRecent(e.Sender.Id)));
                         return false;

@@ -17,7 +17,7 @@ namespace puttingBot.Commands
         public ArcScore()
         {
             nameToCall = "arcsdvx";
-            helpComment = "";
+            helpComment = "a网查分系统";
         }
 
         public static string BindUser(string username,long QQid)
@@ -50,14 +50,14 @@ namespace puttingBot.Commands
             File.WriteAllText(bindfile, JsonConvert.SerializeObject(bindList));
             return "成功绑定" + record.Items[0].Name;
         }
-        public static string GetRecent(long QQid)
+        public static string GetRecent(long QQid,int index=0)
         {
             try
             {
                 BindList bindList = new BindList();
                 if (File.Exists(bindfile))
                     bindList = JsonConvert.DeserializeObject<BindList>(File.ReadAllText(bindfile));
-                if (!bindList.list.Exists(o => o.qqid == QQid)) return "未绑定";
+                if (!bindList.list.Exists(o => o.qqid == QQid)) return "未绑定.使用 #arcsdvx bind 【游戏用户名】，或 #arcsdvx bindid 【a网后台url内id】";
                 string arcid = bindList.list.Find(o => o.qqid == QQid).arcid;
                 List<APlayRecord> aPlays = new List<APlayRecord>();
                 aPlays.Add(Download.downloadJson<APlayRecord>("http://arcana.nu/api/v1/sdvx/5/player_bests/?profile_id=" + arcid, cookie, auth));
@@ -75,8 +75,8 @@ namespace puttingBot.Commands
                     musicData.AddRange(a.Related.Music);
                     chartData.AddRange(a.Related.Charts);
                 }
-                long maxTime = records.Max(o => o.Timestamp.Ticks);
-                AMusicRecord recent = records.Find(o => o.Timestamp.Ticks == maxTime);
+                IEnumerable<AMusicRecord> OrderRecords = records.OrderByDescending(o => o.Timestamp.Ticks);
+                AMusicRecord recent = OrderRecords.ToArray()[index];
                 Music music = musicData.Find(o => o.Id == recent.MusicId);
                 Chart chart = chartData.Find(o => o.Id == recent.ChartId);
 
