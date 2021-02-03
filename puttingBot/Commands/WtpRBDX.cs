@@ -37,7 +37,8 @@ namespace puttingBot.Commands
             }
             catch (Exception e)
             {
-                return e.Message + e.StackTrace;
+                Console.WriteLine(e.Message + e.StackTrace);
+                return "你打一个" + level + "给我看看哟？";
             }
         }
     }
