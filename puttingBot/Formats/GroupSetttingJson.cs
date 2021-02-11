@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GroupSettting
+namespace puttingBot.Formats.GroupSetting
 {
-    class Setting
+    class GroupSetting
     {
         public long groupNum { get; set; }
         public int bindingCity = 0;
@@ -12,8 +12,8 @@ namespace GroupSettting
         //todo:增加黑名单
     }
 
-    class Root
+    class GroupSettingJson
     {
-        public List<Setting> data { get; set; }
+        public List<GroupSetting> data { get; set; }
     }
 }

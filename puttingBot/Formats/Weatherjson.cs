@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace WeatherJson
+namespace puttingBot.Formats.WeatherJson
 {
     public class Station
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace puttingBot.Formats
+namespace puttingBot.Formats.RBDX
 {
     class RbdxCsv
     {

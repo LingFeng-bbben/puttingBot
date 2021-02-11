@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.IO;
-using GroupSettting;
+using puttingBot.Formats.GroupSetting;
 using Newtonsoft.Json;
 
 namespace puttingBot
@@ -11,27 +11,27 @@ namespace puttingBot
     static class GetGSetting
     {
         const string jsonFile = "GroupSetting.json";
-        public static Setting GetSetting(long groupId)
+        public static GroupSetting GetSetting(long groupId)
         {
             string json = File.ReadAllText(jsonFile);
-            Root root = JsonConvert.DeserializeObject<Root>(json);
-            Setting setting = root.data.Find(o => o.groupNum == groupId);
+            GroupSettingJson root = JsonConvert.DeserializeObject<GroupSettingJson>(json);
+            GroupSetting setting = root.data.Find(o => o.groupNum == groupId);
             if (setting != null)
                 return setting;
             else
                 throw new Exception("No record");
         }
-        public static void SetSetting(Setting setting)
+        public static void SetSetting(GroupSetting setting)
         {
-            Root root = new Root();
+            GroupSettingJson root = new GroupSettingJson();
             if (File.Exists(jsonFile))
             {
                 string json = File.ReadAllText(jsonFile);
-                root = JsonConvert.DeserializeObject<Root>(json);
+                root = JsonConvert.DeserializeObject<GroupSettingJson>(json);
             }
             else
             {
-                root.data = new List<Setting>();
+                root.data = new List<GroupSetting>();
             }
             if(root.data.Any(o => o.groupNum == setting.groupNum))
             {

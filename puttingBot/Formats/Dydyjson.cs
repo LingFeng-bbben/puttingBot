@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace puttingBot.dataStructure
+namespace puttingBot.Formats.Dydy
 {
     class DydyJson
     {
@@ -17,6 +17,7 @@ namespace puttingBot.dataStructure
         public long qid = 0;
         public DateTime timeAdded = new DateTime();
         public string dyData = "";
+        public string? pic = "";
         public DyItem(long _qid,string _dydy)
         {
             qid = _qid;

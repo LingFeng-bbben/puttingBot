@@ -18,7 +18,7 @@ namespace puttingBot.Commands
         public static string getRBDX()
         {
             string[] songStr = File.ReadAllLines(filename);
-            Formats.RbdxCsv songDB = new Formats.RbdxCsv(songStr);
+            Formats.RBDX.RbdxCsv songDB = new Formats.RBDX.RbdxCsv(songStr);
             int songCount = songDB.list.Count();
             int songid = random.Next(0, songCount);
             return songDB.list[songid].ToString();
@@ -28,8 +28,8 @@ namespace puttingBot.Commands
             try
             {
                 string[] songStr = File.ReadAllLines(filename);
-                Formats.RbdxCsv songDB = new Formats.RbdxCsv(songStr);
-                List<Formats.RbdxSong> levelList = songDB.list.FindAll(o => o.fumens.Any(p => p.level == level));
+                Formats.RBDX.RbdxCsv songDB = new Formats.RBDX.RbdxCsv(songStr);
+                List<Formats.RBDX.RbdxSong> levelList = songDB.list.FindAll(o => o.fumens.Any(p => p.level == level));
                 Console.WriteLine(levelList);
                 int songCount = levelList.Count();
                 int songid = random.Next(0, songCount);

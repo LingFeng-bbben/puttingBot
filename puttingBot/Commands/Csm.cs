@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using puttingBot.Formats.Dydy;
 
 namespace puttingBot.Commands
 {
@@ -19,15 +20,15 @@ namespace puttingBot.Commands
         public static void add(long qid, string a)
         {
             string text = File.ReadAllText(jsFilePath);
-            dataStructure.DydyJson dydyJson = JsonConvert.DeserializeObject<dataStructure.DydyJson>(text);
+            DydyJson dydyJson = JsonConvert.DeserializeObject<DydyJson>(text);
             if (!dydyJson.dyItems.Any(o => o.dyData == a))
-                dydyJson.dyItems.Add(new dataStructure.DyItem(qid, a));
+                dydyJson.dyItems.Add(new DyItem(qid, a));
             File.WriteAllText(jsFilePath, JsonConvert.SerializeObject(dydyJson, Formatting.Indented));
         }
         public static string read()
         {
             string text = File.ReadAllText(jsFilePath);
-            dataStructure.DydyJson dydyJson = JsonConvert.DeserializeObject<dataStructure.DydyJson>(text);
+            DydyJson dydyJson = JsonConvert.DeserializeObject<DydyJson>(text);
             int radIndex = 0;
             for (int i = 0; i < random.Next(5, random.Next(5, 88)); i++)
                 radIndex = random.Next(0, dydyJson.dyItems.Count);

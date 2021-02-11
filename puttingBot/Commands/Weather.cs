@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using puttingBot.Formats.WeatherJson;
 
 namespace puttingBot.Commands
 {
@@ -16,11 +17,11 @@ namespace puttingBot.Commands
 
         public static string GetWeatherNow(int citycode = 58349)
         {
-            WeatherJson.Root weather = Download.downloadJson<WeatherJson.Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
+            Root weather = Download.downloadJson<Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
 
             string weatherString = "布丁布丁，看看" + weather.data.predict.station.city + "现在天气怎么样哟！\n";
 
-            WeatherJson.Weather wea = weather.data.real.weather;
+            puttingBot.Formats.WeatherJson.Weather wea = weather.data.real.weather;
 
             weatherString += wea.info + ", 温度" + wea.temperature + "℃, 湿度" + wea.humidity + "%\n";
             weatherString += "降水量:" + wea.rain + "mm";
@@ -31,13 +32,13 @@ namespace puttingBot.Commands
 
         public static string GetWeather(int citycode = 58349, int day = 0)
         {
-            WeatherJson.Root weather = Download.downloadJson<WeatherJson.Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
-            WeatherJson.Detail detail = weather.data.predict.detail[day];
+            Root weather = Download.downloadJson<Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
+            Detail detail = weather.data.predict.detail[day];
 
             string weatherString = "布丁布丁，播报天气哟！\n";
             weatherString += weather.data.predict.station.city + " " + detail.date + "\n";
 
-            WeatherJson.Weather wea = new WeatherJson.Weather();
+            puttingBot.Formats.WeatherJson.Weather wea = new puttingBot.Formats.WeatherJson.Weather();
             if (detail.day.weather.info != "9999")
             {
                 wea = detail.day.weather;
@@ -59,7 +60,7 @@ namespace puttingBot.Commands
 
         public static string GetRadar(int citycode = 58349)
         {
-            WeatherJson.Root weather = Download.downloadJson<WeatherJson.Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
+            puttingBot.Formats.WeatherJson.Root weather = Download.downloadJson<Root>("http://www.nmc.cn/rest/weather?stationid=" + citycode);
             string url = weather.data.radar.image;
             string picpath = Download.downloadPic("http://image.nmc.cn" + url, "/usr/weather/");
             return picpath;
