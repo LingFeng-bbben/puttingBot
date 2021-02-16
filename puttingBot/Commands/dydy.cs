@@ -53,7 +53,7 @@ namespace puttingBot.Commands
             if (File.Exists(jsArchivePath))
             {
                 string textA = File.ReadAllText(jsArchivePath);
-                dydyJsonA = JsonConvert.DeserializeObject<DydyJson>(text);
+                dydyJsonA = JsonConvert.DeserializeObject<DydyJson>(textA);
             }
             dydyJsonA.dyItems.AddRange(dydyJson.dyItems.Where(o => o.timeAdded.AddDays(30) < DateTime.Now));
             dydyJson.dyItems.RemoveAll(o => o.timeAdded.AddDays(30) < DateTime.Now);
