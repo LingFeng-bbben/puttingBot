@@ -286,8 +286,8 @@ namespace puttingBot
                     }
                 }
                 //关键词触发
-                if (message.Contains("樱语"))
-                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("嗯的是的哟"));
+                if (message.Contains("njmlp"))
+                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("にじゃまれぴ！"));
                 if (message.Contains("🍮"))
                 {
                     if (message.Contains("💩"))
@@ -295,10 +295,10 @@ namespace puttingBot
                     else
                         await session.SendGroupMessageAsync(e.Sender.Group.Id, say("全部吃掉了哟"));
                 }
-                if (message.Contains("脚本"))
-                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("脚本哥，差不多得了哟"));
+                if (message.Contains("布")&& message.Contains("丁"))
+                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("喊你祖宗干嘛"));
 
-
+                //复读
                 if (repeatedmessage == "") repeatedmessage = message;
                 if (lastmessages.All(o => o == message) && repeatedmessage != message)
                 {
