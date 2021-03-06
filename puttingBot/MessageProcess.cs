@@ -297,6 +297,18 @@ namespace puttingBot
                 }
                 if (message.Contains("布")&& message.Contains("丁"))
                     await session.SendGroupMessageAsync(e.Sender.Group.Id, say("喊你祖宗干嘛"));
+                if (message.StartsWith("我要出勤"))
+                {
+                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Bus.chuqing()));
+                }
+                if (message.StartsWith("观前回家"))
+                {
+                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Bus.huijia_gq()));
+                }
+                if (message.StartsWith("苏中回家"))
+                {
+                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Bus.huijia_sz()));
+                }
 
                 //复读
                 if (repeatedmessage == "") repeatedmessage = message;

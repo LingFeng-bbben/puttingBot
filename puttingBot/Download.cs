@@ -46,11 +46,12 @@ namespace puttingBot
             return JsonConvert.DeserializeObject<T>(downloadText(url, cookie, bearer));
         }
 
-        public static string downloadText(string url,string cookie = "",string bearer = "")
+        public static string downloadText(string url,string cookie = "",string bearer = "",string usragt="")
         {
 
             WebClient wc = new WebClient();
             if (cookie != "") wc.Headers.Add("cookie", cookie);
+            if (usragt != "") wc.Headers.Add("User-Agent", usragt);
             if (bearer != "") wc.Headers.Add("authorization", "Bearer " + bearer);
 
             Console.WriteLine("downloading " + url);
