@@ -26,7 +26,7 @@ namespace puttingBot.Commands
         {
             BusInfo info = downloadLineData(busID);
             int dis = caculateDistance(info, stop);
-            return dis == 999 ? String.Format("{0}还未发车哟", info.lineName) : String.Format("{0}离{1}还有{3}站", info.lineName, schoolBusStop, dis);
+            return dis == 999 ? String.Format("{0}还未发车哟", info.lineName) : String.Format("{0}离{1}还有{2}站", info.lineName, stop, dis);
         }
         public static string chuqing()
         {
