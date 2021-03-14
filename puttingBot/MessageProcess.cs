@@ -64,6 +64,14 @@ namespace puttingBot
                     messages[0] = messages[0].Trim();
                     switch (messages[0])
                     {
+                        case "maimai":
+                            if (messages.Count > 1)
+                            {
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Wtpmaimai.getSong(messages[1])));
+                                return false;
+                            }
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.Wtpmaimai.getSong()));
+                            return false;
                         case "jrrp":
                             int rp = Commands.Jrrp.getJrrp(e.Sender.Id);
                             var reply = new IMessageBase[] { new AtMessage(e.Sender.Id), new PlainMessage("今日人品是：" + rp + " 哟") };
