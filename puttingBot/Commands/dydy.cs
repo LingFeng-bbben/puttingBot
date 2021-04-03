@@ -14,6 +14,7 @@ namespace puttingBot.Commands
         static string jsFilePath = "dydy.json";
         static string jsArchivePath = "dydyArchve.json";
         static Random random = new Random(new Guid().GetHashCode() + (int)DateTime.Now.Ticks);
+        public static int archiveDate = 10;
         public Dydy()
         {
             nameToCall = "dydy";
@@ -55,8 +56,8 @@ namespace puttingBot.Commands
                 string textA = File.ReadAllText(jsArchivePath);
                 dydyJsonA = JsonConvert.DeserializeObject<DydyJson>(textA);
             }
-            dydyJsonA.dyItems.AddRange(dydyJson.dyItems.Where(o => o.timeAdded.AddDays(30) < DateTime.Now));
-            dydyJson.dyItems.RemoveAll(o => o.timeAdded.AddDays(30) < DateTime.Now);
+            dydyJsonA.dyItems.AddRange(dydyJson.dyItems.Where(o => o.timeAdded.AddDays(archiveDate) < DateTime.Now));
+            dydyJson.dyItems.RemoveAll(o => o.timeAdded.AddDays(archiveDate) < DateTime.Now);
             File.WriteAllText(jsFilePath, JsonConvert.SerializeObject(dydyJson, Formatting.Indented));
             File.WriteAllText(jsArchivePath, JsonConvert.SerializeObject(dydyJsonA, Formatting.Indented));
         }

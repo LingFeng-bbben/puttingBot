@@ -36,7 +36,7 @@ namespace puttingBot
             }
             catch (Exception e)
             {
-                Console.WriteLine("failed." + e.Message);
+                Console.WriteLine("failed." + e.Message+e.StackTrace);
                 return "false";
             }
         }

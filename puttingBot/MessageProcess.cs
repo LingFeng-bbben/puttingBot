@@ -151,7 +151,7 @@ namespace puttingBot
                                 if (messages[1] == "archive" && e.Sender.Permission > GroupPermission.Member)
                                 {
                                     Commands.Dydy.archive();
-                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("已归档30天前的dydy"));
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("已归档"+Commands.Dydy.archiveDate+"天前的dydy"));
                                 }
                                 if (messages[1] == "old")
                                 {
