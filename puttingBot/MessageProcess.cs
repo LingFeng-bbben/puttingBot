@@ -86,7 +86,20 @@ namespace puttingBot
                             await session.SendGroupMessageAsync(e.Sender.Group.Id, say(helpMenu));
                             return false;
                         case "sdvx":
-                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSdvx()));
+                            if (messages.Count > 1)
+                            {
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSydx(messages[1],true)));
+                                return false;
+                            }
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSydx(true)));
+                            return false;
+                        case "sydx":
+                            if (messages.Count > 1)
+                            {
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSydx(messages[1])));
+                                return false;
+                            }
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSydx()));
                             return false;
                         case "arcsdvx":
                             if (messages.Count > 2)
