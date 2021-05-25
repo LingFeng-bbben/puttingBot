@@ -39,7 +39,7 @@ namespace puttingBot.Formats
                 else diff[3] = 0;
             }catch(Exception e)
             {
-                Console.WriteLine("SYDX convertion error.at"+line + e.Message + e.StackTrace);
+                //Console.WriteLine("SYDX convertion error.at"+line + e.Message + e.StackTrace);
             }
         }
     }

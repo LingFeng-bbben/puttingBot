@@ -88,18 +88,18 @@ namespace puttingBot
                         case "sdvx":
                             if (messages.Count > 1)
                             {
-                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSydx(messages[1],true)));
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id,await Commands.WhatToPlaySdvx.getSydxAsync(session, messages[1],true));
                                 return false;
                             }
-                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSydx(true)));
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.WhatToPlaySdvx.getSydxAsync(session,true));
                             return false;
                         case "sydx":
                             if (messages.Count > 1)
                             {
-                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSydx(messages[1])));
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id,await Commands.WhatToPlaySdvx.getSydxAsync(session, messages[1]));
                                 return false;
                             }
-                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlaySdvx.getSydx()));
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.WhatToPlaySdvx.getSydxAsync(session, false));
                             return false;
                         case "arcsdvx":
                             if (messages.Count > 2)
@@ -113,10 +113,10 @@ namespace puttingBot
                             if (messages.Count > 1)
                             {
                                 int index = int.Parse(messages[1]);
-                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.ArcScore.GetRecent(e.Sender.Id, index)));
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.ArcScore.GetRecentAsync(e.Sender.Id,session, index));
                                 return false;
                             }
-                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.ArcScore.GetRecent(e.Sender.Id)));
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.ArcScore.GetRecentAsync(e.Sender.Id, session));
                             return false;
                         case "chuni":
                             await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlayChuni.getChuni()));
