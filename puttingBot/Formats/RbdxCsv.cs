@@ -17,6 +17,7 @@ namespace puttingBot.Formats.RBDX
     }
 
     class RbdxSong {
+        public string id;
         public string name;
         public string artist;
         public string source;
@@ -41,6 +42,7 @@ namespace puttingBot.Formats.RBDX
         public RbdxSong(string csv,string div = "	")
         {
             string[] TheSong = csv.Split(div);
+            id = TheSong[0];
             name = TheSong[1];
             artist = TheSong[2];
             source = TheSong[3];

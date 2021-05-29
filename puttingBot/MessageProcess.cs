@@ -124,10 +124,14 @@ namespace puttingBot
                         case "rbdx":
                             if (messages.Count > 1)
                             {
-                                await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlayRBDX.getRBDX(int.Parse(messages[1]))));
+                                int level = 11;
+                                if (int.TryParse(messages[1], out level))
+                                {
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.WhatToPlayRBDX.getRBDXAsync(session, level));
+                                }
                                 return false;
                             }
-                            await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlayRBDX.getRBDX()));
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id,await Commands.WhatToPlayRBDX.getRBDXAsync(session));
                             return false;
                         case "dydy":
                             if (messages.Count > 1)

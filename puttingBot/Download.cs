@@ -12,7 +12,7 @@ namespace puttingBot
 {
     static class Download
     {
-        public static string downloadPic(string url, string path)
+        public static string downloadPic(string url, string path,bool hashname=true)
         {
             WebClient wc = new WebClient();
             MD5 md5 = new MD5CryptoServiceProvider();
@@ -28,10 +28,17 @@ namespace puttingBot
                 Console.WriteLine(image.RawFormat.ToString());
                 if (image.RawFormat.ToString() == "Gif")
                     return "false";
-                string filename = hash + ".jpg";
-                string filepath = path + filename;
-
-                image.Save(filepath);
+                string filepath = path;
+                if (hashname)
+                {
+                    string filename = hash + ".jpg";
+                    filepath = path+filename;
+                    image.Save(filepath);
+                }
+                else
+                {
+                    image.Save(filepath);
+                }
                 return filepath;
             }
             catch (Exception e)
