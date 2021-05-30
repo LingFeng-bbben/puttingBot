@@ -4,7 +4,7 @@ using System.Text;
 
 namespace puttingBot.Formats.arca_a
 {
-    public class BindList
+    public class ABindList
     {
         public List<QABind> list = new List<QABind>();
     }

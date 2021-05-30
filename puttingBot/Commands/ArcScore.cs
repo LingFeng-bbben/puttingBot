@@ -32,9 +32,9 @@ namespace puttingBot.Commands
             if (record.Items.Length <= 0)
                 return "未在A网查找到用户.请检查用户名或网络服务提供者.";
             QABind bind = new QABind(record.Items[0].ProfileId, QQid);
-            BindList bindList = new BindList();
+            ABindList bindList = new ABindList();
             if (File.Exists(bindfile))
-                bindList = JsonConvert.DeserializeObject<BindList>(File.ReadAllText(bindfile));
+                bindList = JsonConvert.DeserializeObject<ABindList>(File.ReadAllText(bindfile));
             if (bindList.list.Exists(o => o.qqid == QQid))
             {
                 bindList.list.Remove(bindList.list.Find(o => o.qqid == QQid));
@@ -49,9 +49,9 @@ namespace puttingBot.Commands
         {
             AUserRecord record = Download.downloadJson<AUserRecord>("https://arcana.nu/api/v1/sdvx/5/profiles/?_id=" + arcid, cookie, auth);
             QABind bind = new QABind(record.Items[0].ProfileId, QQid);
-            BindList bindList = new BindList();
+            ABindList bindList = new ABindList();
             if (File.Exists(bindfile))
-                bindList = JsonConvert.DeserializeObject<BindList>(File.ReadAllText(bindfile));
+                bindList = JsonConvert.DeserializeObject<ABindList>(File.ReadAllText(bindfile));
             if (bindList.list.Exists(o => o.qqid == QQid))
             {
                 bindList.list.Remove(bindList.list.Find(o => o.qqid == QQid));
@@ -64,9 +64,9 @@ namespace puttingBot.Commands
         {
             try
             {
-                BindList bindList = new BindList();
+                ABindList bindList = new ABindList();
                 if (File.Exists(bindfile))
-                    bindList = JsonConvert.DeserializeObject<BindList>(File.ReadAllText(bindfile));
+                    bindList = JsonConvert.DeserializeObject<ABindList>(File.ReadAllText(bindfile));
                 if (!bindList.list.Exists(o => o.qqid == QQid)) {
                     IMessageBase[] errmessage = { new PlainMessage("未绑定.使用 #arcsdvx bind 【游戏用户名】，或 #arcsdvx bindid 【a网后台url内id】") };
                     return errmessage;

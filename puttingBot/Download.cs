@@ -48,20 +48,31 @@ namespace puttingBot
             }
         }
 
-        public static T downloadJson<T>(string url, string cookie = "", string bearer = "")
+        public static T downloadJson<T>(string url, string cookie = "", string bearer = "", string token = "")
         {
-            return JsonConvert.DeserializeObject<T>(downloadText(url, cookie, bearer));
+            return JsonConvert.DeserializeObject<T>(downloadText(url, cookie, bearer, "", token));
         }
 
-        public static string downloadText(string url,string cookie = "",string bearer = "",string usragt="")
+        public static string RequestPOST(string url,string data="")
+        {
+            WebClient wc = new WebClient();
+            byte[] bufsend = Encoding.UTF8.GetBytes(data);
+            byte[] buf = wc.UploadData(url, "POST", bufsend);
+            string text = Encoding.UTF8.GetString(buf);
+            return text;
+        }
+
+        public static string downloadText(string url,string cookie = "",string bearer = "",string usragt="", string token = "")
         {
 
             WebClient wc = new WebClient();
-            if (cookie != "") wc.Headers.Add("cookie", cookie);
-            if (usragt != "") wc.Headers.Add("User-Agent", usragt);
-            if (bearer != "") wc.Headers.Add("authorization", "Bearer " + bearer);
+            if (cookie != "") { wc.Headers.Add("cookie", cookie); }
+            if (usragt != "") { wc.Headers.Add("User-Agent", usragt); }
+            if (bearer != "") { wc.Headers.Add("authorization", "Bearer " + bearer); }
+            if (token != "") { wc.Headers.Add("token", token); }
 
             Console.WriteLine("downloading " + url);
+            Console.WriteLine(wc.Headers.ToString());
             try
             {
                 byte[] data = wc.DownloadData(url);

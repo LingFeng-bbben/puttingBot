@@ -34,7 +34,9 @@ namespace puttingBot
                 await session.DisposeAsync();
             session = new MiraiHttpSession(); 
             session.BotDroppedEvt += OnBotDropped;
-            MessageProcrss mp = new MessageProcrss();
+            MessageProcrssGroup mp = new MessageProcrssGroup();
+            MessageProcessFriend mpf = new MessageProcessFriend();
+            session.AddPlugin(mpf);
             session.AddPlugin(mp);
             while (true)
             {

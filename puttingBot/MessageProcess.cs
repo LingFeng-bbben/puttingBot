@@ -11,7 +11,8 @@ using puttingBot.Formats.Dydy;
 
 namespace puttingBot
 {
-    public class MessageProcrss : IGroupMessage
+
+    public class MessageProcrssGroup : IGroupMessage
     {
         List<string> lastmessages = new List<string>();
         IMessageBase[] say(string a) {
@@ -117,6 +118,28 @@ namespace puttingBot
                                 return false;
                             }
                             await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.ArcScore.GetRecentAsync(e.Sender.Id, session));
+                            return false;
+                        case "unis":
+                            if (messages.Count > 2)
+                            {
+                                if (messages[1] == "send")
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.UnisScore.SendText(messages[2], e.Sender.Id)));
+                                if (messages[1] == "login")
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.UnisScore.Login(messages[2], e.Sender.Id)));
+                                return false;
+                            }
+                            if (messages.Count > 1)
+                            {
+                                if (messages[1] == "status")
+                                {
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.UnisScore.Status(e.Sender.Id)));
+                                    return false;
+                                }
+                                int index = int.Parse(messages[1]);
+                                await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.UnisScore.GetRecentAsync(e.Sender.Id, session, index));
+                                return false;
+                            }
+                            await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.UnisScore.GetRecentAsync(e.Sender.Id, session));
                             return false;
                         case "chuni":
                             await session.SendGroupMessageAsync(e.Sender.Group.Id, say(Commands.WhatToPlayChuni.getChuni()));
@@ -357,5 +380,93 @@ namespace puttingBot
             }
         }
         string repeatedmessage = "";
+
+
+    }
+
+    public class MessageProcessFriend:IFriendMessage
+    {
+        IMessageBase[] say(string a)
+        {
+            Console.WriteLine("REPLY: " + a);
+            return new IMessageBase[] { new PlainMessage(a) };
+        }
+        public async Task<bool> FriendMessage(MiraiHttpSession session, IFriendMessageEventArgs e) // 法1: 使用 IMessageBase[]
+        {
+            string message = "";
+            string imgurl = "";
+            string types = "";
+            foreach (IMessageBase messageBase in e.Chain)
+            {
+                if (messageBase.Type == "Plain")
+                    message = message + messageBase.ToString();
+                if (messageBase.Type == "At")
+                {
+                    AtMessage at = (AtMessage)messageBase;
+                    if (at.Target == Program.selfQQnum)
+                    {
+                        await session.SendFriendMessageAsync(e.Sender.Id, say("不要艾特我哟！！！"));
+                        return false;
+                    }
+                }
+                if (messageBase.Type == "Image")
+                {
+                    ImageMessage img = (ImageMessage)messageBase;
+                    imgurl = img.Url;
+                }
+                types = types + ',' + messageBase.Type.Trim();
+            }
+            if (message.StartsWith('#'))
+            {
+                message = message.Remove(0, 1);
+                List<string> messages = message.Split(' ').ToList();
+                messages[0] = messages[0].ToLower();
+                messages[0] = messages[0].Trim();
+                switch (messages[0])
+                {
+                    case "jrrp":
+                        int rp = Commands.Jrrp.getJrrp(e.Sender.Id);
+                        var reply = new IMessageBase[] { new AtMessage(e.Sender.Id), new PlainMessage("今日人品是：" + rp + " 哟") };
+                        await session.SendFriendMessageAsync(e.Sender.Id, reply);
+                        return false;
+                    case "sdvx":
+                        if (messages.Count > 1)
+                        {
+                            await session.SendFriendMessageAsync(e.Sender.Id, await Commands.WhatToPlaySdvx.getSydxAsync(session, messages[1], true));
+                            return false;
+                        }
+                        await session.SendFriendMessageAsync(e.Sender.Id, await Commands.WhatToPlaySdvx.getSydxAsync(session, true));
+                        return false;
+                    case "arcsdvx":
+                        if (messages.Count > 2)
+                        {
+                            if (messages[1] == "bind")
+                                await session.SendFriendMessageAsync(e.Sender.Id, say(Commands.ArcScore.BindUser(messages[2], e.Sender.Id)));
+                            if (messages[1] == "bindid")
+                                await session.SendFriendMessageAsync(e.Sender.Id, say(Commands.ArcScore.Bindid(messages[2], e.Sender.Id)));
+                            return false;
+                        }
+                        await session.SendFriendMessageAsync(e.Sender.Id, say("私聊只能绑定"));
+                        return false;
+                    case "unis":
+                        if (messages.Count > 2)
+                        {
+                            if (messages[1] == "send")
+                                await session.SendFriendMessageAsync(e.Sender.Id, say(Commands.UnisScore.SendText(messages[2], e.Sender.Id)));
+                            if (messages[1] == "login")
+                                await session.SendFriendMessageAsync(e.Sender.Id, say(Commands.UnisScore.Login(messages[2], e.Sender.Id)));
+                            return false;
+                        }
+                        await session.SendFriendMessageAsync(e.Sender.Id, say("私聊只能绑定"));
+                        return false;
+
+                    default:
+                        Console.WriteLine("Unknown command:" + messages[0]);
+                        await session.SendFriendMessageAsync(e.Sender.Id, say("什么东西哟"));
+                        return false;
+                }
+            }
+            return false;
+        }
     }
 }
