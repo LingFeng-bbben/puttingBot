@@ -64,6 +64,7 @@ namespace puttingBot.Commands
             File.WriteAllText(bindfile, JsonConvert.SerializeObject(bindList));
             var status = Download.downloadJson<UnisStatus>(
                 "https://iot.universal-space.cn/api/mns/mnsGameStatis/getUserRecordStatis?productId=3084", "", "", token);
+            
             return "成功绑定" + status.Data.PlayerName;
         }
 
@@ -103,7 +104,15 @@ namespace puttingBot.Commands
                 var status = Download.downloadJson<UnisStatus>(
                         "https://iot.universal-space.cn/api/mns/mnsGameStatis/getUserRecordStatis?productId=3084", "", "", token);
                 if (status.Code != 1)
+                {
+                    if (status.Message == "权限不足")
+                    {
+                        SendText(bindList.list.Find(o => o.qqid == QQid).phoneNumber, QQid);
+                        return new IMessageBase[] { new PlainMessage("权限不足：可能是登录过期，已为您重新发送验证码。\n登录：#unis login 验证码") };
+                    }
                     return new IMessageBase[] { new PlainMessage(status.Message + status.Detail) };
+                }
+                    
                 index++;
                 var playdata = Download.downloadJson<Unisdvx>(
                         "https://iot.universal-space.cn/api/mns/mnsGame/recordList?productId=3084&pageNo="+index+"&pageSize=1&orderBy=gameDate", "", "", token);

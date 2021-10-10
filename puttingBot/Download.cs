@@ -66,6 +66,11 @@ namespace puttingBot
         {
 
             WebClient wc = new WebClient();
+            System.Net.ServicePointManager.ServerCertificateValidationCallback +=
+    (se, cert, chain, sslerror) =>
+    {
+        return true;
+    };
             if (cookie != "") { wc.Headers.Add("cookie", cookie); }
             if (usragt != "") { wc.Headers.Add("User-Agent", usragt); }
             if (bearer != "") { wc.Headers.Add("authorization", "Bearer " + bearer); }

@@ -416,6 +416,7 @@ namespace puttingBot
                 }
                 types = types + ',' + messageBase.Type.Trim();
             }
+            Console.WriteLine("私聊：{2}:[{0}]({3}):{1}", types, message, e.Sender.Id, imgurl);
             if (message.StartsWith('#'))
             {
                 message = message.Remove(0, 1);
