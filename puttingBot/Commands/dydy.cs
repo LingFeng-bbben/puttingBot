@@ -28,8 +28,9 @@ namespace puttingBot.Commands
                 dydyJson.dyItems.Add(a);
             File.WriteAllText(jsFilePath, JsonConvert.SerializeObject(dydyJson, Formatting.Indented));
         }
-        public static IMessageBase[] read(bool isArchive=false)
+        public static IMessageBase[] read(bool isArchive = false)
         {
+
             string text = "";
             if (isArchive)
                 text = File.ReadAllText(jsArchivePath);
@@ -39,12 +40,23 @@ namespace puttingBot.Commands
             int radIndex = 0;
             for (int i = 0; i < random.Next(5, random.Next(5, 88)); i++)
                 radIndex = random.Next(0, dydyJson.dyItems.Count);
-            List<IMessageBase> message = new List<IMessageBase>();
-            if (dydyJson.dyItems[radIndex].dyData != "")
-                message.Add(new PlainMessage(dydyJson.dyItems[radIndex].dyData));
-            if (dydyJson.dyItems[radIndex].pic != "")
-                message.Add(new ImageMessage(null, dydyJson.dyItems[radIndex].pic, null));
-            return message.ToArray();
+            try
+            {
+                List<IMessageBase> message = new List<IMessageBase>();
+                if (dydyJson.dyItems[radIndex].dyData != "")
+                    message.Add(new PlainMessage(dydyJson.dyItems[radIndex].dyData));
+                if (dydyJson.dyItems[radIndex].pic != "")
+                {
+                    message.Add(new ImageMessage(null, dydyJson.dyItems[radIndex].pic, null));
+                    var result = Download.downloadPic(dydyJson.dyItems[radIndex].pic, "dydyCache/" + dydyJson.dyItems[radIndex].timeAdded.Ticks+".jpg",false);
+                    if (result == "false") throw new Exception("corroped");
+                }
+                return message.ToArray();
+            }
+            catch
+            {
+                return new IMessageBase[] { new PlainMessage("肥肠抱歉，此DYDY档已经毁损\nTime:" + dydyJson.dyItems[radIndex].timeAdded) };
+            }
         }
         public static void archive()
         {
