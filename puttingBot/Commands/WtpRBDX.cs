@@ -30,8 +30,8 @@ namespace puttingBot.Commands
             int songid = random.Next(0, songCount);
             string text = levelList[songid].ToString();
             string pngpath = await cacheJacket(levelList[songid].id);
-            ImageMessage jkt = await session.UploadPictureAsync(UploadTarget.Group, pngpath);
-            IMessageBase[] message = {jkt, new PlainMessage(text) };
+            //ImageMessage jkt = await session.UploadPictureAsync(UploadTarget.Group, pngpath);
+            IMessageBase[] message = { new PlainMessage(text) };
             return message;
         }
         public static async Task<IMessageBase[]> getRBDXAsync(MiraiHttpSession session,int level)
@@ -48,8 +48,8 @@ namespace puttingBot.Commands
                 int songid = random.Next(0, songCount);
                 string text = levelList[songid].ToString();
                 string pngpath = await cacheJacket(levelList[songid].id);
-                ImageMessage jkt = await session.UploadPictureAsync(UploadTarget.Group, pngpath);
-                IMessageBase[] message = { jkt, new PlainMessage(text) };
+                //ImageMessage jkt = await session.UploadPictureAsync(UploadTarget.Group, pngpath);
+                IMessageBase[] message = { new PlainMessage(text) };
                 return message;
             }
             catch (Exception e)
