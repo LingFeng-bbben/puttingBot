@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using puttingBot.Formats.Dydy;
 using Mirai_CSharp.Models;
+using Mirai_CSharp;
+using System.Threading.Tasks;
 
 namespace puttingBot.Commands
 {
@@ -25,10 +27,13 @@ namespace puttingBot.Commands
             string text = File.ReadAllText(jsFilePath);
             DydyJson dydyJson = JsonConvert.DeserializeObject<DydyJson>(text);
             if (!dydyJson.dyItems.Any(o => o.dyData == a.dyData && o.pic == a.pic))
+            {
                 dydyJson.dyItems.Add(a);
+                Download.downloadPic(a.pic, "dydyCache/" + a.timeAdded.Ticks + ".jpg", false);
+            }
             File.WriteAllText(jsFilePath, JsonConvert.SerializeObject(dydyJson, Formatting.Indented));
         }
-        public static IMessageBase[] read(bool isArchive = false)
+        public async static Task<IMessageBase[]> read(MiraiHttpSession session,bool isArchive = false)
         {
 
             string text = "";
@@ -47,9 +52,18 @@ namespace puttingBot.Commands
                     message.Add(new PlainMessage(dydyJson.dyItems[radIndex].dyData));
                 if (dydyJson.dyItems[radIndex].pic != "")
                 {
-                    message.Add(new ImageMessage(null, dydyJson.dyItems[radIndex].pic, null));
-                    var result = Download.downloadPic(dydyJson.dyItems[radIndex].pic, "dydyCache/" + dydyJson.dyItems[radIndex].timeAdded.Ticks+".jpg",false);
-                    if (result == "false") throw new Exception("corroped");
+                    var filename = "dydyCache/" + dydyJson.dyItems[radIndex].timeAdded.Ticks + ".jpg";
+                    if (!File.Exists(filename))
+                    {
+                        message.Add(new ImageMessage(null, dydyJson.dyItems[radIndex].pic, null));
+                        var result = Download.downloadPic(dydyJson.dyItems[radIndex].pic, filename, false);
+                        if (result == "false") throw new Exception("corroped");
+                    }
+                    else
+                    {
+                        ImageMessage jkt = await session.UploadPictureAsync(UploadTarget.Group, filename);
+                        message.Add(jkt);
+                    }
                 }
                 return message.ToArray();
             }

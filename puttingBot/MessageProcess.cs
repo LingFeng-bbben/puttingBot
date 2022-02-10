@@ -186,7 +186,7 @@ namespace puttingBot
                                 {
                                     groupsetting.disableDydy = false;
                                     GetGSetting.SetSetting(groupsetting);
-                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, Commands.Dydy.read());
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, say("dydy已启用"));
                                 }
                                 if (messages[1] == "archive" && e.Sender.Permission > GroupPermission.Member)
                                 {
@@ -196,7 +196,7 @@ namespace puttingBot
                                 if (messages[1] == "old")
                                 {
                                     if (!groupsetting.disableDydy)
-                                        await session.SendGroupMessageAsync(e.Sender.Group.Id, Commands.Dydy.read(true));
+                                        await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.Dydy.read(session,true));
                                 }
                                 if (messages[1] != "add" && messages[1].StartsWith("add"))
                                 {
@@ -218,7 +218,7 @@ namespace puttingBot
                             else
                             {
                                 if (!groupsetting.disableDydy)
-                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, Commands.Dydy.read());
+                                    await session.SendGroupMessageAsync(e.Sender.Group.Id, await Commands.Dydy.read(session));
                             }
                             return false;
                         case "csm":
